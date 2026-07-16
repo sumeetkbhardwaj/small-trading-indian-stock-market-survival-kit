@@ -1,0 +1,31 @@
+{
+  "name": "small-trading-indian-stock-market-survival-kit",
+  "owner": {
+    "name": "Sumeet Kumar",
+    "url": "https://github.com/sumeetkbhardwaj"
+  },
+  "metadata": {
+    "description": "Marketplace for the survival-first Indian-equity decision-support kit."
+  },
+  "plugins": [
+    {
+      "name": "small-trader",
+      "source": "./",
+      "description": "Survival-first Indian-equity decision-support kit (research/educational, advisory-only). Read-only screen/shortlist/signal + portfolio-watch; not investment advice; not a SEBI-registered IA/RA; no warranty.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Sumeet Kumar"
+      },
+      "homepage": "https://github.com/sumeetkbhardwaj/small-trading-indian-stock-market-survival-kit",
+      "license": "MIT",
+      "keywords": [
+        "indian-stock-market",
+        "nse",
+        "trading",
+        "survival-first",
+        "zerodha",
+        "mcp"
+      ]
+    }
+  ]
+}

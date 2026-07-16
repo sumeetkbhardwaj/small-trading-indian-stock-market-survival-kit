@@ -1,0 +1,11 @@
+{
+  "name": "small-trader",
+  "version": "0.1.0",
+  "description": "Survival-first Indian-equity decision-support kit (research/educational, advisory-only). Not investment advice; not a SEBI-registered IA/RA. No warranty.",
+  "author": {
+    "name": "Sumeet Kumar"
+  },
+  "homepage": "https://github.com/sumeetkbhardwaj/small-trading-indian-stock-market-survival-kit",
+  "repository": "https://github.com/sumeetkbhardwaj/small-trading-indian-stock-market-survival-kit",
+  "license": "MIT"
+}
