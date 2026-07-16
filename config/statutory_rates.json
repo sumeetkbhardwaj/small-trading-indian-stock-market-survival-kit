@@ -1,0 +1,19 @@
+{
+  "stt.delivery":          {"value": "0.001",   "as_of": "2026-04-01", "source": "Zerodha charges; verify-2", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stt.intraday_sell":     {"value": "0.00025", "as_of": "2024-10-01", "source": "verify-2 C2", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stt.futures_sell":      {"value": "0.0005",  "as_of": "2026-04-01", "source": "verify-2 C2", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stt.options_sell":      {"value": "0.0015",  "as_of": "2026-04-01", "source": "verify-2 C2", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stt.options_exercise":  {"value": "0.0015",  "as_of": "2026-04-01", "source": "verify-3; R11", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "tax.stcg_equity":       {"value": "0.20",    "as_of": "2024-07-23", "source": "s.111A; CBDT PIB 2036604", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "tax.ltcg_equity":       {"value": "0.125",   "as_of": "2024-07-23", "source": "s.112A", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "tax.ltcg_exemption_inr":{"value": "125000",  "as_of": "2024-07-23", "source": "s.112A", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "exchange.cash":         {"value": "0.0000307","as_of": "2024-01-01","source": "13:73", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "exchange.futures":      {"value": "0.0000183","as_of": "2024-01-01","source": "13:73", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "exchange.options":      {"value": "0.0003553","as_of": "2024-01-01","source": "13:73", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "sebi.turnover":         {"value": "0.000001", "as_of": "2024-01-01", "source": "13:87", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "gst.rate":              {"value": "0.18",     "as_of": "2024-01-01", "source": "13:90", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stamp.delivery":        {"value": "0.00015",  "as_of": "2024-01-01", "source": "13:94", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stamp.intraday":        {"value": "0.00003",  "as_of": "2024-01-01", "source": "13:94", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stamp.futures":         {"value": "0.00002",  "as_of": "2024-01-01", "source": "13:94", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stamp.options":         {"value": "0.00003",  "as_of": "2024-01-01", "source": "13:94", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"}
+}
