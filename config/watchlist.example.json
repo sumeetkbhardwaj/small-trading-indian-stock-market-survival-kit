@@ -1,0 +1,10 @@
+{
+  "_comment": "Copy this to config/watchlist.json and edit. These are the symbols the autopilot skill scans each run. Keep to liquid Nifty-500 names; the exclusion + liquidity gates will drop anything unsafe, and most names will be rejected on any given day (that is the design).",
+  "universe": [
+    "RELIANCE",
+    "HDFCBANK",
+    "INFY",
+    "TCS",
+    "ICICIBANK"
+  ]
+}

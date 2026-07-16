@@ -18,10 +18,10 @@ small-trading-indian-stock-market-survival-kit is a **read-only advisory** pipel
 
 ## Features
 
-- **Deterministic survival-math core** (`scripts/`) — cost/tax engine, position sizing, portfolio heat, data-freshness checks, and the signal-validity gate, covered by 59 unit tests.
-- **Read-only skills and commands** — `/small-trader:check`, `/small-trader:screen`, `/small-trader:portfolio-watch`, `/small-trader:premarket`, `/small-trader:eod` — that orchestrate the deterministic core against live or EOD market data.
+- **Deterministic survival-math core** (`scripts/`) — cost/tax engine, position sizing, portfolio heat, data-freshness checks, and the signal-validity gate, covered by a unit-test suite (CI across Python 3.11–3.13).
+- **Read-only skills and commands** — `/small-trader:check`, `/small-trader:screen`, `/small-trader:portfolio-watch`, `/small-trader:premarket`, `/small-trader:eod`, and `/small-trader:autopilot` — that orchestrate the deterministic core against live or EOD market data.
 - **Kite MCP read-only data path** — quotes/holdings/positions/historical via the Zerodha Kite MCP connector, governed by an explicit data-freshness contract (market-phase x feed-type x mode); stale or missing data fails closed to no-action.
-- **Cloud Routine scheduling** — pre-market and end-of-day runs on a schedule, with no execution tool reachable, notifying you rather than acting for you (see `routines/README.md`).
+- **Fully autonomous mode (Cloud Routines)** — the `autopilot` skill runs the whole review (regime → portfolio → opportunity scan → notify) unattended on Anthropic's cloud: zero human interaction, zero self-hosting. A routine is a real code-execution session, so the deterministic gate runs there — you get autonomy *and* verified, model-invariant results. Read-only; no execution tool reachable (see `routines/autopilot-routine.md`).
 
 ## How it works
 

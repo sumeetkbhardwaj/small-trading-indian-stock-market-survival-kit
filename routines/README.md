@@ -1,6 +1,8 @@
 # Running the kit on a schedule (Cloud Routine)
 
-The v1 kit runs UNATTENDED and READ-ONLY on an Anthropic Cloud Routine (no machine needed).
+The kit runs UNATTENDED and READ-ONLY on an Anthropic Cloud Routine (no machine needed). Because a routine is a full Claude Code cloud session, it **runs `scripts/kit.py`**, so the deterministic gate fires and the numbers are verified and model-invariant — with zero self-hosting.
+
+> **Fully autonomous mode:** for a zero-human-interaction agent that does the whole review (regime → portfolio → opportunity scan) and notifies you, see **[`autopilot-routine.md`](autopilot-routine.md)** and the `autopilot` skill. The single-command routines below (`/premarket`, `/eod`) are the simpler building blocks.
 
 ## One-time setup
 1. Install this repo as a plugin / point a Routine at this git repo.
