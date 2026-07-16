@@ -1,0 +1,7 @@
+[
+  {"price": "1000", "qty": 100, "segment": "delivery", "brokerage": "0", "dp": "15.34"},
+  {"price": "100", "qty": 300, "segment": "delivery", "brokerage": "0", "dp": "15.34"},
+  {"price": "500", "qty": 50, "segment": "intraday", "brokerage": "20", "dp": "0"},
+  {"price": "250.5", "qty": 40, "segment": "delivery", "brokerage": "0", "dp": "13.5"},
+  {"price": "37.85", "qty": 260, "segment": "delivery", "brokerage": "0", "dp": "15.34"}
+]

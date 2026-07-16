@@ -1,4 +1,4 @@
-"""M6 portfolio-heat exact covariance identity sigma = L*sqrt(N + N(N-1)*rho)
+"""Portfolio-heat exact covariance identity sigma = L*sqrt(N + N(N-1)*rho)
 (equal per-trade risk L), plus the two crash tests the caps must satisfy.
 The sqrt(N*rho) shortcut is WRONG and understates the correlated case."""
 from decimal import Decimal

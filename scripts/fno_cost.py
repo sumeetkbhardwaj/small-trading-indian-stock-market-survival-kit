@@ -1,4 +1,4 @@
-"""M7 F&O/options/futures cost engine. STT 0.15% on premium for short option
+"""F&O/options/futures cost engine. STT 0.15% on premium for short option
 legs; 0.05% on sell notional for futures. Net R:R computed after all legs' cost."""
 from dataclasses import dataclass
 from decimal import Decimal

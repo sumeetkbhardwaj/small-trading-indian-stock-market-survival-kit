@@ -1,0 +1,54 @@
+{
+  "pass_long_2r": {
+    "decision": "long",
+    "disclaimer": "Investment in securities market are subject to market risks. Read all the related documents carefully before investing. This is decision-support for research and educational use only, not investment advice; the author is not a SEBI-registered Investment Adviser or Research Analyst. You are solely responsible for your own decisions.",
+    "entry": "100.00",
+    "exit": {
+      "risk_per_share": "5.00",
+      "stop_distance_pct": "0.05000000",
+      "stop_price": "95.00",
+      "target_min_2r": "110.00",
+      "targets": [
+        {
+          "price": "110.00",
+          "r": "2.0000"
+        }
+      ],
+      "trailing_rule": "trail under the 10/21-EMA or last higher-low swing; ratchet by stage (never breakeven-at-1R)"
+    },
+    "freshness": "fresh",
+    "shares": 300,
+    "statutory_breakeven_pct": "0.00282800",
+    "stop": "95.00",
+    "symbol": "T",
+    "veto_reason": ""
+  },
+  "veto_asymmetry": {
+    "decision": "no_trade",
+    "disclaimer": "Investment in securities market are subject to market risks. Read all the related documents carefully before investing. This is decision-support for research and educational use only, not investment advice; the author is not a SEBI-registered Investment Adviser or Research Analyst. You are solely responsible for your own decisions.",
+    "shares": 0,
+    "symbol": "T",
+    "veto_reason": "asymmetry: best target < 2R (need reward:risk >= 2:1 at entry)"
+  },
+  "veto_cost": {
+    "decision": "no_trade",
+    "disclaimer": "Investment in securities market are subject to market risks. Read all the related documents carefully before investing. This is decision-support for research and educational use only, not investment advice; the author is not a SEBI-registered Investment Adviser or Research Analyst. You are solely responsible for your own decisions.",
+    "shares": 0,
+    "symbol": "T",
+    "veto_reason": "cost: stop distance 0.00010000 <= statutory break-even 0.00282800"
+  },
+  "veto_frequency": {
+    "decision": "no_trade",
+    "disclaimer": "Investment in securities market are subject to market risks. Read all the related documents carefully before investing. This is decision-support for research and educational use only, not investment advice; the author is not a SEBI-registered Investment Adviser or Research Analyst. You are solely responsible for your own decisions.",
+    "shares": 0,
+    "symbol": "T",
+    "veto_reason": "frequency: 3 trades today >= cap 3 (stand down)"
+  },
+  "veto_freshness": {
+    "decision": "no_trade",
+    "disclaimer": "Investment in securities market are subject to market risks. Read all the related documents carefully before investing. This is decision-support for research and educational use only, not investment advice; the author is not a SEBI-registered Investment Adviser or Research Analyst. You are solely responsible for your own decisions.",
+    "shares": 0,
+    "symbol": "T",
+    "veto_reason": "freshness: required feed stale or missing"
+  }
+}

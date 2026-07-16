@@ -31,4 +31,4 @@ def test_fno_stripped_max_loss_forces_no_trade():
 def test_fno_stripped_max_profit_forces_no_trade():
     sig = FnOSignal(decision="long", tier="fno", legs=[object()], net_credit=D("50"),
                     defined_max_loss=D("5000"), defined_max_profit=None, net_rr=D("1"))
-    assert validate_fno_signal(sig).decision == "no_trade"   # RV-3: net_rr uncomputable
+    assert validate_fno_signal(sig).decision == "no_trade"   # net_rr uncomputable

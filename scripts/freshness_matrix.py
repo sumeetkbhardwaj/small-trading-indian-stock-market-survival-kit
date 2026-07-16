@@ -1,4 +1,4 @@
-"""M1 freshness matrix (market-phase x feed-type x mode). Freshness only ever
+"""Freshness matrix (market-phase x feed-type x mode). Freshness only ever
 REMOVES optionality. A delayed lower-trust source may warn but never veto the
 authoritative live tick (expected lag is not a conflict)."""
 

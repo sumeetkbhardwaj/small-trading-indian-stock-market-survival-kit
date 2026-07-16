@@ -1,5 +1,5 @@
 """SEBI Ad-Code-safe verbatim disclaimer surfaced on every user-facing output.
-No assured/guaranteed/target-return/superlative language (spec M12/CR-42)."""
+No assured/guaranteed/target-return/superlative language."""
 DISCLAIMER = (
     "Investment in securities market are subject to market risks. "
     "Read all the related documents carefully before investing. "

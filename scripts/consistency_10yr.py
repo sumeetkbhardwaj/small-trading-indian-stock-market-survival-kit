@@ -1,4 +1,4 @@
-"""M4c Coffee-Can temporal quality: ROCE>=15% (ROE>=15% for financials) AND
+"""Coffee-Can temporal quality: ROCE>=15% (ROE>=15% for financials) AND
 revenue growth >=10% in EVERY one of the last N consecutive years."""
 from dataclasses import dataclass
 from decimal import Decimal

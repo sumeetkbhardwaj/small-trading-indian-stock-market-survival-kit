@@ -1,0 +1,33 @@
+{
+  "pass_long_2r": {
+    "symbol": "T", "segment": "delivery", "entry": "100", "stop": "95", "atr": "1",
+    "equity": "200000", "risk": "0.01", "cap": "0.15", "heat": "6000", "gross": "80000",
+    "exposure": "1", "brokerage": "0", "dp": "15.34", "targets": ["110"], "tier": "swing",
+    "freshness": {"feed_type": "ltp", "mode": "eod", "market_phase": "closed", "age_seconds": 40000, "present": true}
+  },
+  "veto_freshness": {
+    "symbol": "T", "segment": "delivery", "entry": "100", "stop": "95", "atr": "1",
+    "equity": "200000", "risk": "0.01", "cap": "0.15", "heat": "6000", "gross": "80000",
+    "exposure": "1", "brokerage": "0", "dp": "15.34", "targets": ["110"], "tier": "swing",
+    "freshness": {"feed_type": "ltp", "mode": "eod", "market_phase": "closed", "age_seconds": 40000, "present": false}
+  },
+  "veto_frequency": {
+    "symbol": "T", "segment": "delivery", "entry": "100", "stop": "95", "atr": "1",
+    "equity": "200000", "risk": "0.01", "cap": "0.15", "heat": "6000", "gross": "80000",
+    "exposure": "1", "brokerage": "0", "dp": "15.34", "targets": ["110"], "tier": "swing",
+    "frequency": {"trades_today": 3, "open_positions": 0, "max_trades_per_day": 3, "max_open_positions": 5},
+    "freshness": {"feed_type": "ltp", "mode": "eod", "market_phase": "closed", "age_seconds": 40000, "present": true}
+  },
+  "veto_asymmetry": {
+    "symbol": "T", "segment": "delivery", "entry": "100", "stop": "95", "atr": "1",
+    "equity": "200000", "risk": "0.01", "cap": "0.15", "heat": "6000", "gross": "80000",
+    "exposure": "1", "brokerage": "0", "dp": "15.34", "targets": ["104"], "tier": "swing",
+    "freshness": {"feed_type": "ltp", "mode": "eod", "market_phase": "closed", "age_seconds": 40000, "present": true}
+  },
+  "veto_cost": {
+    "symbol": "T", "segment": "delivery", "entry": "1000", "stop": "999.9", "atr": "1",
+    "equity": "200000", "risk": "0.01", "cap": "0.15", "heat": "6000", "gross": "80000",
+    "exposure": "1", "brokerage": "0", "dp": "15.34", "targets": ["1100"], "tier": "swing",
+    "freshness": {"feed_type": "ltp", "mode": "eod", "market_phase": "closed", "age_seconds": 40000, "present": true}
+  }
+}

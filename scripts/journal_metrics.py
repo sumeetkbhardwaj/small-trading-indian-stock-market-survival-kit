@@ -1,4 +1,4 @@
-"""M14 trade-journal metrics, all net of costs (trades carry net R and net pnl).
+"""Trade-journal metrics, all net of costs (trades carry net R and net pnl).
 SQN = sqrt(N) * mean(R) / stdev(R) (Van Tharp), sample stdev."""
 from dataclasses import dataclass
 from decimal import Decimal

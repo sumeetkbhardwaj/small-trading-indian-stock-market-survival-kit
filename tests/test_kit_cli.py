@@ -55,6 +55,54 @@ def test_evaluate_missing_data_is_no_trade():
     assert out["decision"] == "no_trade"
     assert "freshness" in out["veto_reason"].lower()
 
+def test_evaluate_includes_exit_contract_and_passes_with_2r_target():
+    candidate = {
+        "symbol": "TEST", "segment": "delivery", "entry": "100", "stop": "95",
+        "atr": "1", "equity": "200000", "risk": "0.01", "cap": "0.15",
+        "heat": "6000", "gross": "80000", "exposure": "1", "brokerage": "0", "dp": "15.34",
+        "targets": ["110"], "tier": "swing",
+        "freshness": {"feed_type": "ltp", "mode": "eod", "market_phase": "closed",
+                      "age_seconds": 40000, "present": True}
+    }
+    out = run("evaluate", stdin=json.dumps(candidate))
+    assert out["decision"] == "long"
+    ex = out["exit"]
+    assert ex["risk_per_share"] == "5.00"
+    assert ex["target_min_2r"] == "110.00"
+    assert ex["targets"][0]["r"] == "2.0000"
+    assert "EMA" in ex["trailing_rule"]
+
+
+def test_evaluate_rejects_sub_2r_target():
+    candidate = {
+        "symbol": "TEST", "segment": "delivery", "entry": "100", "stop": "95",
+        "atr": "1", "equity": "200000", "risk": "0.01", "cap": "0.15",
+        "heat": "6000", "gross": "80000", "exposure": "1", "brokerage": "0", "dp": "15.34",
+        "targets": ["104"], "tier": "swing",
+        "freshness": {"feed_type": "ltp", "mode": "eod", "market_phase": "closed",
+                      "age_seconds": 40000, "present": True}
+    }
+    out = run("evaluate", stdin=json.dumps(candidate))
+    assert out["decision"] == "no_trade"
+    assert "asymmetry" in out["veto_reason"].lower()
+
+
+def test_evaluate_frequency_governor_stands_down():
+    candidate = {
+        "symbol": "TEST", "segment": "delivery", "entry": "100", "stop": "95",
+        "atr": "1", "equity": "200000", "risk": "0.01", "cap": "0.15",
+        "heat": "6000", "gross": "80000", "exposure": "1", "brokerage": "0", "dp": "15.34",
+        "targets": ["110"], "tier": "swing",
+        "frequency": {"trades_today": 3, "open_positions": 0,
+                      "max_trades_per_day": 3, "max_open_positions": 5},
+        "freshness": {"feed_type": "ltp", "mode": "eod", "market_phase": "closed",
+                      "age_seconds": 40000, "present": True}
+    }
+    out = run("evaluate", stdin=json.dumps(candidate))
+    assert out["decision"] == "no_trade"
+    assert "frequency" in out["veto_reason"].lower()
+
+
 def test_disclaimer_is_sebi_safe():
     from scripts.disclaimer import DISCLAIMER
     d = DISCLAIMER.lower()

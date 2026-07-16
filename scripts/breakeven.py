@@ -1,4 +1,4 @@
-"""M7 statutory break-even FLOOR: the minimum % move to cover buy+sell statutory
+"""Statutory break-even FLOOR: the minimum % move to cover buy+sell statutory
 costs (execution cost is added separately in exec_cost.py — do not conflate)."""
 from decimal import Decimal
 from scripts.cost_tax import equity_costs

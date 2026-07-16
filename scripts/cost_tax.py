@@ -1,4 +1,4 @@
-"""M7 statutory equity costs + capital-gains tax. All Decimal; rates from config."""
+"""Statutory equity costs + capital-gains tax. All Decimal; rates from config."""
 from dataclasses import dataclass
 from decimal import Decimal
 from scripts.money import D, round_paisa

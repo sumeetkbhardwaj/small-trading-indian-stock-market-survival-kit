@@ -1,13 +1,13 @@
 from decimal import Decimal
 import pytest
-from scripts.config_loader import load_rates, rate, StaleRateError
+from scripts.config_loader import load_rates, rate, StaleRateError, load_risk_config, ConfigInvariantError
 
 RATES = "config/statutory_rates.json"
 
 def test_verified_constants_present_and_current():
     r = load_rates(RATES, today="2026-07-16")
     assert rate(r, "stt.delivery", "2026-07-16") == Decimal("0.001")       # 0.10%
-    assert rate(r, "stt.options_exercise", "2026-07-16") == Decimal("0.0015")  # 0.15% (R11, not 0.0625%)
+    assert rate(r, "stt.options_exercise", "2026-07-16") == Decimal("0.0015")  # 0.15% (not 0.0625%)
     assert rate(r, "tax.stcg_equity", "2026-07-16") == Decimal("0.20")
     assert rate(r, "tax.ltcg_equity", "2026-07-16") == Decimal("0.125")
 
@@ -15,11 +15,6 @@ def test_rate_past_hard_expiry_fails_closed():
     r = load_rates(RATES, today="2026-07-16")
     with pytest.raises(StaleRateError):
         rate(r, "stt.delivery", today="2099-01-01")  # any far-future date is past hard_expiry
-
-# add to tests/test_config_loader.py
-from decimal import Decimal
-import pytest
-from scripts.config_loader import load_risk_config, ConfigInvariantError
 
 BASE = {
     "risk_pct": "0.01", "risk_cap_pct": "0.02", "heat_pct": "0.03",

@@ -1,6 +1,6 @@
-"""M8 Black-Scholes (European; correct for NSE index options). Float math is
+"""Black-Scholes (European; correct for NSE index options). Float math is
 intentional here — greeks/IV are model outputs, not money. IV solving RAISES
-IVUnavailable rather than falling back to a fixed vol (spec CR-39)."""
+IVUnavailable rather than falling back to a fixed vol."""
 import math
 
 class IVUnavailable(RuntimeError):

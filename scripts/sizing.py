@@ -1,5 +1,5 @@
-"""M6 sizing: min over SHARE COUNTS (one unit), exposure applied exactly once.
-shares_gross binds the overnight aggregate-gross cap AT sizing time (R-M-1).
+"""Position sizing: min over SHARE COUNTS (one unit), exposure applied exactly once.
+shares_gross binds the overnight aggregate-gross cap AT sizing time.
 Positional tier uses a valuation stop, not k*ATR; ATR max-stop veto is swing-only."""
 import math
 from dataclasses import dataclass

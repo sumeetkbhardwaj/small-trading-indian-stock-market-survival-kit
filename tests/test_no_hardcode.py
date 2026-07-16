@@ -4,7 +4,7 @@ SCRIPTS = list(pathlib.Path("scripts").glob("*.py"))
 
 def test_no_stale_or_live_constant_hardcoded_in_bodies():
     # No skill/script body may hardcode a lot size, an expiry weekday, or the
-    # stale exercise-STT literal. Everything must read from config (R14).
+    # stale exercise-STT literal. Everything must read from config.
     banned = [r"\b75\b", r"\b65\b", r"Thursday", r"Tuesday", r"0\.0625", r"0\.125\b"]
     offenders = []
     for p in SCRIPTS:

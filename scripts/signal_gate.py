@@ -1,7 +1,7 @@
-"""M9 signal-object gate. Equity: stripped entry|stop|size_pct -> no_trade;
+"""Signal-object gate. Equity: stripped entry|stop|size_pct -> no_trade;
 stripped target dropped, no_trade only if none remain. Stop must be on the
 correct side. F&O: stripped defined_max_loss|defined_max_profit|net_credit|leg
--> no_trade (RV-3). No gate branch keys on confidence (not a field here)."""
+-> no_trade. No gate branch keys on confidence (not a field here)."""
 from dataclasses import dataclass, replace
 from decimal import Decimal
 

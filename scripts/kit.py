@@ -9,7 +9,7 @@ _ROOT = Path(__file__).resolve().parent.parent
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_EVEN
 from scripts.money import D
 from scripts.config_loader import load_rates
 from scripts.cost_tax import equity_costs
@@ -17,6 +17,8 @@ from scripts.breakeven import statutory_breakeven_pct
 from scripts.sizing import size_position
 from scripts.freshness_matrix import freshness_verdict, FRESH, DOWNGRADE, NO_TRADE
 from scripts.signal_gate import EquitySignal, validate_equity_signal
+from scripts.exit_contract import passes_2r_gate, build_exit_contract
+from scripts.frequency_governor import frequency_verdict, OK as FREQ_OK
 from scripts.disclaimer import DISCLAIMER
 
 RATES_PATH = str(_ROOT / "config" / "statutory_rates.json")
@@ -24,6 +26,18 @@ FRESH_CFG = {"eod_max_age": 86400, "ltp_live_max_age": 5, "bar_max_age": 300, "i
 
 def _dec(x):
     return str(x)
+
+# Display-precision quantization so every surface (Python CLI, JS-paise Artifact, self-hosted MCP)
+# emits byte-identical strings: prices to paise, percents to 8dp, R-multiples to 4dp, HALF_EVEN.
+PRICE_DP, PCT_DP, R_DP = 2, 8, 4
+def _q(x, places):
+    return str(D(x).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_EVEN))
+
+def _exit_json(ec):
+    return {"stop_price": _q(ec["stop_price"], PRICE_DP), "risk_per_share": _q(ec["risk_per_share"], PRICE_DP),
+            "stop_distance_pct": _q(ec["stop_distance_pct"], PCT_DP), "target_min_2r": _q(ec["target_min_2r"], PRICE_DP),
+            "targets": [{"price": _q(t["price"], PRICE_DP), "r": _q(t["r"], R_DP)} for t in ec["targets"]],
+            "trailing_rule": ec["trailing_rule"]}
 
 def cmd_cost(a):
     rates = load_rates(RATES_PATH, a.today)
@@ -35,7 +49,7 @@ def cmd_cost(a):
 def cmd_breakeven(a):
     rates = load_rates(RATES_PATH, a.today)
     be = statutory_breakeven_pct(D(a.price), a.qty, a.segment, rates, a.today, D(a.brokerage), D(a.dp))
-    return {"statutory_breakeven_pct": _dec(be)}
+    return {"statutory_breakeven_pct": _q(be, PCT_DP)}
 
 def cmd_size(a):
     n = size_position(D(a.equity), D(a.risk), D(a.entry), D(a.atr), D(a.k), D(a.cap),
@@ -56,6 +70,14 @@ def cmd_evaluate(a):
     base = {"symbol": c.get("symbol"), "disclaimer": DISCLAIMER}
     if fv == NO_TRADE:
         return {**base, "decision": "no_trade", "shares": 0, "veto_reason": "freshness: required feed stale or missing"}
+    # Frequency governor (behavioral gate, runs early): if the skill supplies un-fakeable
+    # session counters and a cap is hit, stand down before any setup is even scored.
+    freq = c.get("frequency")
+    if freq:
+        fverdict = frequency_verdict(freq["trades_today"], freq["open_positions"],
+                                     freq["max_trades_per_day"], freq["max_open_positions"])
+        if fverdict != FREQ_OK:
+            return {**base, "decision": "no_trade", "shares": 0, "veto_reason": fverdict}
     rates = load_rates(RATES_PATH, today)
     entry, stop = D(c["entry"]), D(c["stop"])
     qty_notional = D(c["equity"]) * D(c["cap"])  # cap notional as the cost-check reference size
@@ -65,7 +87,7 @@ def cmd_evaluate(a):
     stop_dist_pct = abs(entry - stop) / entry
     if stop_dist_pct <= be:
         return {**base, "decision": "no_trade", "shares": 0,
-                "veto_reason": f"cost: stop distance {stop_dist_pct} <= statutory break-even {be}"}
+                "veto_reason": f"cost: stop distance {_q(stop_dist_pct, PCT_DP)} <= statutory break-even {_q(be, PCT_DP)}"}
     shares = size_position(D(c["equity"]), D(c["risk"]), entry, D(c["atr"]), D("2"), D(c["cap"]),
                            D(c["heat"]), D(c["gross"]), D(c["exposure"]),
                            tier=c.get("tier", "swing"),
@@ -78,8 +100,14 @@ def cmd_evaluate(a):
         invalidation_price=stop, net_rr=D(c.get("net_rr", "0"))))
     if sig.decision == "no_trade":
         return {**base, "decision": "no_trade", "shares": 0, "veto_reason": "signal-gate: invalid signal object"}
-    return {**base, "decision": "long", "shares": shares, "entry": _dec(entry), "stop": _dec(stop),
-            "statutory_breakeven_pct": _dec(be), "freshness": fv, "veto_reason": ""}
+    # Win/loss asymmetry gate: no entry verdict without a machine-computed exit that clears 2R.
+    targets_list = [D(t) for t in c.get("targets", []) if t not in (None, "", "0", 0)]
+    if not passes_2r_gate(entry, stop, targets_list):
+        return {**base, "decision": "no_trade", "shares": 0,
+                "veto_reason": "asymmetry: best target < 2R (need reward:risk >= 2:1 at entry)"}
+    ec = build_exit_contract(entry, stop, targets_list, c.get("tier", "swing"))
+    return {**base, "decision": "long", "shares": shares, "entry": _q(entry, PRICE_DP), "stop": _q(stop, PRICE_DP),
+            "statutory_breakeven_pct": _q(be, PCT_DP), "freshness": fv, "exit": _exit_json(ec), "veto_reason": ""}
 
 def build_parser():
     p = argparse.ArgumentParser(prog="kit")
