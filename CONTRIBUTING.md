@@ -35,6 +35,20 @@ Statutory and regulatory values (STT, STCG/LTCG, exchange charges, GST, stamp du
 
 **Live order-execution code is out of scope for this repository.** This is a read-only advisory and monitoring kit (v1): screen, shortlist, signal, hold/trim/exit. Do not submit PRs that add order placement, modification, or cancellation — keeping the public project read-only/advisory is a deliberate scope and compliance boundary.
 
+## Releases & versioning (SemVer)
+
+This plugin follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`.
+
+- **PATCH** (e.g. `0.2.0` → `0.2.1`) — backward-compatible fixes: a corrected statutory constant, a bug fix, a doc-in-manifest tweak, no change to the skill/command/output surface.
+- **MINOR** (e.g. `0.2.1` → `0.3.0`) — backward-compatible additions: a new skill/command, a new gate that doesn't alter existing verdicts or the config schema.
+- **MAJOR** (e.g. `0.x` → `1.0.0`) — breaking changes: removing/renaming a skill or command, changing the deterministic-gate output contract, or changing the `config/` schema. (Pre-`1.0.0`, the surface may still change under MINOR, but treat breaking changes conservatively and call them out.)
+
+The `version` field is **explicitly set**, so installed plugins only receive an update when the version is **bumped** — a plain `git push` with no version change delivers nothing to users. Therefore:
+
+- Bump the version on every release you intend users to receive.
+- Keep the version **identical** in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` (`plugins[].version`).
+- Docs-only changes to `README.md` / `SETUP.md` / `CONTRIBUTING.md` are not surfaced in the plugin manager and do not require a version bump.
+
 ## PR checklist
 
 - `python -m pytest -q` passes locally.

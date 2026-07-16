@@ -17,4 +17,10 @@
 
 7. **What v1 does NOT do:** place orders. Live order execution is out of scope for this public repo; the deny hook enforces read-only across every surface.
 
+## Staying up to date
+
+New releases bump the plugin **version** (SemVer). To receive them automatically, enable auto-update **once** for this marketplace: run `/plugin` → **Marketplaces** tab → select the marketplace → **Enable auto-update**. Claude then refreshes the catalog and updates installed plugins in the background shortly after each session starts (you'll be prompted to `/reload-plugins`, or the new version loads next launch). Auto-update is **off by default for third-party marketplaces**, so this one-time toggle is what stops you having to update by hand.
+
+To update manually instead: `/plugin marketplace update small-trading-indian-stock-market-survival-kit`, then reinstall (`/plugin uninstall small-trader@…` + `/plugin install small-trader@…`) and `/reload-plugins`. Note: a source-repo change with **no version bump** will not trigger an update.
+
 This kit is research/educational, advisory-only software — not investment advice, not a SEBI-registered IA/RA. Every output ends with the SEBI disclaimer; the default is no-trade. Provided with no warranty. Deploying it as a service for others, or placing orders on someone's behalf, is your own regulatory responsibility (SEBI algo-provider/RA obligations), not this project's.
