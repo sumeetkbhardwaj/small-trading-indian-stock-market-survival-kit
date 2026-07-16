@@ -9,6 +9,15 @@ def run(*args, stdin=None):
     assert p.returncode == 0, p.stderr
     return json.loads(p.stdout)
 
+def test_kit_runs_as_direct_script_from_foreign_cwd(tmp_path):
+    """Installed-plugin context: run kit.py directly, cwd != repo root, no PYTHONPATH."""
+    p = subprocess.run([sys.executable, str(KIT / "scripts" / "kit.py"),
+                        "cost", "--segment", "delivery", "--side", "sell",
+                        "--price", "1000", "--qty", "100", "--brokerage", "0", "--dp", "15.34"],
+                       cwd=str(tmp_path), capture_output=True, text=True)
+    assert p.returncode == 0, p.stderr
+    assert json.loads(p.stdout)["stt"] == "100.00"
+
 def test_cost_subcommand():
     out = run("cost", "--segment", "delivery", "--side", "sell", "--price", "1000",
               "--qty", "100", "--brokerage", "0", "--dp", "15.34")

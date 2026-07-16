@@ -2,7 +2,7 @@
 
 1. **Install the plugin** in Claude web / Desktop. Add the marketplace with `/plugin marketplace add sumeetkbhardwaj/small-trading-indian-stock-market-survival-kit` (or paste the repo URL in the Add-marketplace dialog and Sync), then install with `/plugin install small-trader@small-trading-indian-stock-market-survival-kit`.
 2. **Connect Zerodha Kite MCP** as a READ-ONLY connector (quotes/holdings/positions/historical). Do not enable order tools.
-3. **Set up the Python env** (for Bash-capable runs): `python3 -m venv .venv && .venv/bin/pip install pytest`. The gate CLI needs no third-party deps.
+3. **Runtime requirement:** the deterministic gate CLI needs only **Python 3.11+** (standard library — no venv, no `pip install`) available in Claude's shell/code-execution environment. The skills invoke it via `${CLAUDE_PLUGIN_ROOT}/scripts/kit.py`. In a chat-only surface with no code execution, the kit degrades to advisory-only (it will not fabricate the gate numbers). *(A `.venv` + `pytest` is only for running the test suite as a contributor — see `CONTRIBUTING.md`.)*
 4. **Try it interactively:** `/small-trader:portfolio-watch`, then `/small-trader:screen nifty500`.
 5. **Schedule it:** follow `routines/README.md` to create a Cloud Routine for `/small-trader:premarket` and `/small-trader:eod`. It runs read-only and notifies you.
 6. **What v1 does NOT do:** place orders. Live order-execution is out of scope for this public repo — v2 (self-hosted execution, static-IP, approval-gated) is a separate, self-hosted deployment you would build only after you have run v1 and trust its signals.

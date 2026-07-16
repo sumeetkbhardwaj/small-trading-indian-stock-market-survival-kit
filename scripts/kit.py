@@ -1,6 +1,14 @@
 """Deterministic gate CLI — the ONLY place decisions are computed. Skills call
 these subcommands with JSON and narrate the results. Read-only; advisory only."""
 import argparse, json, sys
+from pathlib import Path
+
+# Make the `scripts` package importable whether invoked as `python -m scripts.kit`
+# from the plugin root or directly as `python3 <plugin>/scripts/kit.py` (installed).
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
 from decimal import Decimal
 from scripts.money import D
 from scripts.config_loader import load_rates
@@ -11,7 +19,7 @@ from scripts.freshness_matrix import freshness_verdict, FRESH, DOWNGRADE, NO_TRA
 from scripts.signal_gate import EquitySignal, validate_equity_signal
 from scripts.disclaimer import DISCLAIMER
 
-RATES_PATH = "config/statutory_rates.json"
+RATES_PATH = str(_ROOT / "config" / "statutory_rates.json")
 FRESH_CFG = {"eod_max_age": 86400, "ltp_live_max_age": 5, "bar_max_age": 300, "iv_max_age": 300}
 
 def _dec(x):

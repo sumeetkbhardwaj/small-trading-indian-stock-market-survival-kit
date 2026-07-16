@@ -13,7 +13,7 @@ Every value you return MUST carry `{value, source, timestamp}`. Never return a b
 3. **Delayed/free** (yfinance/other) — lowest trust; may *warn* but must never veto an authoritative Kite tick (expected 15-min lag is not a conflict).
 
 ## Freshness contract
-- Stamp each feed and pass it to `.venv/bin/python -m scripts.kit freshness --feed_type ... --mode ... --market_phase ... --age_seconds ... --present true`.
+- Stamp each feed and pass it to `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/kit.py" freshness --feed_type ... --mode ... --market_phase ... --age_seconds ... --present true`.
 - `no_trade` verdict → the calling skill must drop that dependency (never fabricate).
 - Default mode is **eod** (daily bars / prior close) — the ₹0/mo lane; only use `live` mode if the user opted into the live-tick feed.
 

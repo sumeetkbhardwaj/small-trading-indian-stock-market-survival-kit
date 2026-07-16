@@ -14,7 +14,7 @@ Default output is **no candidate**. A stock earns a place on the shortlist only 
 4. **Fundamental red-flags.** For each survivor, note promoter pledge, OCF/PAT, auditor/rating flags (from `india-data`). Exclude on a hard red flag.
 5. **Technical setup.** Rank by 6m+12m relative strength; keep only Trend-Template survivors near a valid pivot (within ~5% — never chase an extended breakout).
 6. **Cost/size/gate — deterministic.** For each remaining candidate, build the evaluate JSON and run:
-   `.venv/bin/python -m scripts.kit evaluate` (stdin = candidate JSON). Keep only `decision == long` with `shares > 0`.
+   `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/kit.py" evaluate` (stdin = candidate JSON). Keep only `decision == long` with `shares > 0`.
 7. **Output.** For each survivor: symbol, entry, stop, shares, statutory break-even, and the dominant reason it passed. If none pass, say "No trade — here is the gate that eliminated the most names." Append the disclaimer verbatim (it is in every `evaluate` output).
 
 ## Never
