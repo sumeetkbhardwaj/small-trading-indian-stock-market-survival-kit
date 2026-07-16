@@ -1,7 +1,7 @@
 {
   "name": "small-trader",
-  "version": "0.1.0",
-  "description": "Survival-first Indian-equity decision-support kit (research/educational, advisory-only). Not investment advice; not a SEBI-registered IA/RA. No warranty.",
+  "version": "0.2.0",
+  "description": "Survival-first, broker-agnostic Indian-equity decision-support kit (research/educational, advisory-only): read-only screening, research, portfolio evaluation, watchlist monitoring, and scheduled reviews across claude.ai surfaces; fail-closed, write-tool-denied. Not investment advice; not a SEBI-registered IA/RA. No warranty.",
   "author": {
     "name": "Sumeet Kumar"
   },
