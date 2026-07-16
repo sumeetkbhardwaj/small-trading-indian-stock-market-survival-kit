@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Survival Gate — single-name calculator</title>
+<style>
+:root{
+  --paper:#f7f8f7; --ink:#12201f; --muted:#5c6b69; --line:#e2e6e4; --card:#ffffff;
+  --accent:#0f6f6b; --good:#2f7a4f; --warn:#a86b12; --bad:#b23b3b; --neutral:#6b7472;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:ui-serif,Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0e1413; --ink:#e7edea; --muted:#93a19e; --line:#233029; --card:#141c1a;
+  --accent:#3fb3ad; --good:#57b07e; --warn:#d29b4a; --bad:#e0736f; --neutral:#8a938f;
+}}
+:root[data-theme="dark"]{--paper:#0e1413;--ink:#e7edea;--muted:#93a19e;--line:#233029;--card:#141c1a;--accent:#3fb3ad;--good:#57b07e;--warn:#d29b4a;--bad:#e0736f;--neutral:#8a938f;}
+:root[data-theme="light"]{--paper:#f7f8f7;--ink:#12201f;--muted:#5c6b69;--line:#e2e6e4;--card:#ffffff;--accent:#0f6f6b;--good:#2f7a4f;--warn:#a86b12;--bad:#b23b3b;--neutral:#6b7472;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;font-variant-numeric:tabular-nums}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 64px}
+h1{font-family:var(--serif);font-weight:600;font-size:1.5rem;margin:0 0 2px;text-wrap:balance}
+.eyebrow{text-transform:uppercase;letter-spacing:.09em;font-size:.7rem;color:var(--muted);margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--muted)}
+input,select{font-family:var(--mono);font-size:.95rem;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px}
+button{font-family:var(--sans);font-weight:600;font-size:.95rem;padding:10px 18px;border:0;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer}
+button:focus{outline:2px solid var(--ink);outline-offset:2px}
+.result{margin-top:20px}
+.pill{display:inline-block;font-weight:700;font-size:.8rem;letter-spacing:.04em;padding:4px 12px;border-radius:999px;color:#fff}
+.pill.long{background:var(--good)} .pill.no_trade{background:var(--bad)}
+.verdict{font-family:var(--serif);font-size:1.2rem;margin:10px 0 4px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-family:var(--mono);font-size:.92rem;margin-top:10px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;text-align:right}
+.veto{color:var(--bad);font-family:var(--mono);font-size:.92rem;margin-top:8px}
+.trail{color:var(--muted);font-size:.85rem;margin-top:10px}
+.note{color:var(--muted);font-size:.8rem;margin-top:14px}
+footer{color:var(--muted);font-size:.76rem;border-top:1px solid var(--line);margin-top:26px;padding-top:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Survival-first · read-only · advisory</div>
+  <h1>Single-name gate calculator</h1>
+  <p class="note">Enter the trade you're tempted by. The gate runs entirely in your browser — the same
+  deterministic math as the kit's Python core (parity-locked). Default answer is NO-TRADE. You supply
+  the numbers, so they carry <strong>delay_class: manual</strong>; verify prices in your broker.</p>
+
+  <div class="card">
+    <form id="f" autocomplete="off">
+      <label>Symbol<input id="symbol" value="RELIANCE"></label>
+      <label>Segment<select id="segment"><option value="delivery">delivery</option><option value="intraday">intraday</option></select></label>
+      <label>Entry ₹<input id="entry" value="100" inputmode="decimal"></label>
+      <label>Stop ₹<input id="stop" value="95" inputmode="decimal"></label>
+      <label>Target ₹<input id="target" value="110" inputmode="decimal"></label>
+      <label>ATR ₹<input id="atr" value="1" inputmode="decimal"></label>
+      <label>Equity ₹<input id="equity" value="200000" inputmode="decimal"></label>
+      <label>Risk %<input id="risk" value="0.01" inputmode="decimal"></label>
+      <label>Single-name cap<input id="cap" value="0.15" inputmode="decimal"></label>
+      <label>Remaining heat ₹<input id="heat" value="6000" inputmode="decimal"></label>
+      <label>Remaining gross ₹<input id="gross" value="80000" inputmode="decimal"></label>
+      <label>Exposure dial<input id="exposure" value="1" inputmode="decimal"></label>
+      <label>Brokerage ₹<input id="brokerage" value="0" inputmode="decimal"></label>
+      <label>DP ₹<input id="dp" value="15.34" inputmode="decimal"></label>
+      <div class="row"><button id="run" type="submit">Run the gate</button></div>
+    </form>
+    <div class="result" id="out" aria-live="polite"></div>
+  </div>
+
+  <footer id="disclaimer"></footer>
+</div>
+
+<script type="module">
+/*INLINE_DEC*/
+/*INLINE_GATE*/
+const RATES = /*INLINE_RATES*/;
+
+const $ = (id) => document.getElementById(id);
+document.getElementById("disclaimer").textContent = DISCLAIMER;
+
+function candidate(){
+  const t = $("target").value.trim();
+  return {
+    symbol: $("symbol").value || "—",
+    segment: $("segment").value,
+    entry: $("entry").value.trim(), stop: $("stop").value.trim(),
+    targets: t ? [t] : [],
+    atr: $("atr").value.trim(), equity: $("equity").value.trim(), risk: $("risk").value.trim(),
+    cap: $("cap").value.trim(), heat: $("heat").value.trim(), gross: $("gross").value.trim(),
+    exposure: $("exposure").value.trim(), brokerage: $("brokerage").value.trim(), dp: $("dp").value.trim(),
+    tier: "swing",
+    freshness: { feed_type: "ltp", mode: "eod", market_phase: "closed", age_seconds: 40000, present: true }
+  };
+}
+
+function esc(s){ return String(s).replace(/[&<>]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c])); }
+
+function render(r){
+  const out = $("out");
+  if (r.decision === "long"){
+    const ex = r.exit;
+    out.innerHTML =
+      '<span class="pill long">TRADE — passes every gate</span>' +
+      '<div class="verdict">' + esc(r.symbol) + ' · size ' + r.shares + ' shares</div>' +
+      '<dl class="kv">' +
+      '<dt>Entry</dt><dd>' + esc(r.entry) + '</dd>' +
+      '<dt>Stop</dt><dd>' + esc(ex.stop_price) + ' (' + esc(ex.stop_distance_pct) + ' away)</dd>' +
+      '<dt>Min target (2R)</dt><dd>' + esc(ex.target_min_2r) + '</dd>' +
+      '<dt>Best target R</dt><dd>' + esc(ex.targets.length ? ex.targets[0].r : "—") + '</dd>' +
+      '<dt>Break-even to clear costs</dt><dd>' + esc(r.statutory_breakeven_pct) + '</dd>' +
+      '</dl>' +
+      '<div class="trail">Exit rule: ' + esc(ex.trailing_rule) + '</div>';
+  } else {
+    out.innerHTML =
+      '<span class="pill no_trade">NO-TRADE</span>' +
+      '<div class="veto">Dominant reason — ' + esc(r.veto_reason) + '</div>' +
+      '<div class="note">The refusal is the feature. No setup is worth the survival risk here.</div>';
+  }
+}
+
+$("f").addEventListener("submit", (e) => {
+  e.preventDefault();
+  try { render(evaluate(candidate(), RATES)); }
+  catch (err) { $("out").innerHTML = '<div class="veto">Could not run: ' + esc(err.message) + '. Check the inputs.</div>'; }
+});
+render(evaluate(candidate(), RATES));
+</script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Survival Gate — single-name calculator</title>
+<style>
+:root{
+  --paper:#f7f8f7; --ink:#12201f; --muted:#5c6b69; --line:#e2e6e4; --card:#ffffff;
+  --accent:#0f6f6b; --good:#2f7a4f; --warn:#a86b12; --bad:#b23b3b; --neutral:#6b7472;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:ui-serif,Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0e1413; --ink:#e7edea; --muted:#93a19e; --line:#233029; --card:#141c1a;
+  --accent:#3fb3ad; --good:#57b07e; --warn:#d29b4a; --bad:#e0736f; --neutral:#8a938f;
+}}
+:root[data-theme="dark"]{--paper:#0e1413;--ink:#e7edea;--muted:#93a19e;--line:#233029;--card:#141c1a;--accent:#3fb3ad;--good:#57b07e;--warn:#d29b4a;--bad:#e0736f;--neutral:#8a938f;}
+:root[data-theme="light"]{--paper:#f7f8f7;--ink:#12201f;--muted:#5c6b69;--line:#e2e6e4;--card:#ffffff;--accent:#0f6f6b;--good:#2f7a4f;--warn:#a86b12;--bad:#b23b3b;--neutral:#6b7472;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;font-variant-numeric:tabular-nums}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 64px}
+h1{font-family:var(--serif);font-weight:600;font-size:1.5rem;margin:0 0 2px;text-wrap:balance}
+.eyebrow{text-transform:uppercase;letter-spacing:.09em;font-size:.7rem;color:var(--muted);margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--muted)}
+input,select{font-family:var(--mono);font-size:.95rem;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px}
+button{font-family:var(--sans);font-weight:600;font-size:.95rem;padding:10px 18px;border:0;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer}
+button:focus{outline:2px solid var(--ink);outline-offset:2px}
+.result{margin-top:20px}
+.pill{display:inline-block;font-weight:700;font-size:.8rem;letter-spacing:.04em;padding:4px 12px;border-radius:999px;color:#fff}
+.pill.long{background:var(--good)} .pill.no_trade{background:var(--bad)}
+.verdict{font-family:var(--serif);font-size:1.2rem;margin:10px 0 4px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-family:var(--mono);font-size:.92rem;margin-top:10px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;text-align:right}
+.veto{color:var(--bad);font-family:var(--mono);font-size:.92rem;margin-top:8px}
+.trail{color:var(--muted);font-size:.85rem;margin-top:10px}
+.note{color:var(--muted);font-size:.8rem;margin-top:14px}
+footer{color:var(--muted);font-size:.76rem;border-top:1px solid var(--line);margin-top:26px;padding-top:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Survival-first · read-only · advisory</div>
+  <h1>Single-name gate calculator</h1>
+  <p class="note">Enter the trade you're tempted by. The gate runs entirely in your browser — the same
+  deterministic math as the kit's Python core (parity-locked). Default answer is NO-TRADE. You supply
+  the numbers, so they carry <strong>delay_class: manual</strong>; verify prices in your broker.</p>
+
+  <div class="card">
+    <form id="f" autocomplete="off">
+      <label>Symbol<input id="symbol" value="RELIANCE"></label>
+      <label>Segment<select id="segment"><option value="delivery">delivery</option><option value="intraday">intraday</option></select></label>
+      <label>Entry ₹<input id="entry" value="100" inputmode="decimal"></label>
+      <label>Stop ₹<input id="stop" value="95" inputmode="decimal"></label>
+      <label>Target ₹<input id="target" value="110" inputmode="decimal"></label>
+      <label>ATR ₹<input id="atr" value="1" inputmode="decimal"></label>
+      <label>Equity ₹<input id="equity" value="200000" inputmode="decimal"></label>
+      <label>Risk %<input id="risk" value="0.01" inputmode="decimal"></label>
+      <label>Single-name cap<input id="cap" value="0.15" inputmode="decimal"></label>
+      <label>Remaining heat ₹<input id="heat" value="6000" inputmode="decimal"></label>
+      <label>Remaining gross ₹<input id="gross" value="80000" inputmode="decimal"></label>
+      <label>Exposure dial<input id="exposure" value="1" inputmode="decimal"></label>
+      <label>Brokerage ₹<input id="brokerage" value="0" inputmode="decimal"></label>
+      <label>DP ₹<input id="dp" value="15.34" inputmode="decimal"></label>
+      <div class="row"><button id="run" type="submit">Run the gate</button></div>
+    </form>
+    <div class="result" id="out" aria-live="polite"></div>
+  </div>
+
+  <footer id="disclaimer"></footer>
+</div>
+
+<script type="module">
+// dec.mjs — BigInt fixed-scale decimal for the JS-paise gate Artifact. Money is exact integers
+// (float is banned, exactly as in the Python core's money.py). Internal scale = 20 decimal places;
+// values are BigInt = value * 10^SCALE. mul/div round half-even; quantize takes the mode. Outputs
+// are quantized to a fixed display precision so every surface (Python, this JS) matches byte-for-byte.
+const SCALE = 20n;
+const TEN = 10n;
+const SCALE_F = TEN ** SCALE;
+
+const pow10 = (n) => TEN ** BigInt(n);
+
+function fromString(s) {
+  s = String(s).trim();
+  let neg = false;
+  if (s[0] === "+") s = s.slice(1);
+  if (s[0] === "-") { neg = true; s = s.slice(1); }
+  let [intp, frac = ""] = s.split(".");
+  intp = intp || "0";
+  frac = (frac + "0".repeat(Number(SCALE))).slice(0, Number(SCALE));
+  const v = BigInt(intp) * SCALE_F + BigInt(frac || "0");
+  return neg ? -v : v;
+}
+
+const add = (a, b) => a + b;
+const sub = (a, b) => a - b;
+const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
+// Divide num by den, rounding the quotient to an integer. mode: "half_up" | "half_even".
+function roundedDiv(num, den, mode) {
+  const neg = (num < 0n) !== (den < 0n);
+  const n = num < 0n ? -num : num;
+  const d = den < 0n ? -den : den;
+  let q = n / d;
+  const r = n % d;
+  if (r !== 0n) {
+    const twice = r * 2n;
+    let up;
+    if (twice > d) up = true;
+    else if (twice < d) up = false;
+    else up = mode === "half_up" ? true : (q % 2n === 1n); // half_even: round to even
+    if (up) q += 1n;
+  }
+  return neg ? -q : q;
+}
+
+const mul = (a, b) => roundedDiv(a * b, SCALE_F, "half_even");
+const div = (a, b) => roundedDiv(a * SCALE_F, b, "half_even");
+
+// Round to `places` decimals with `mode`, returning a scaled value zeroed beyond `places`.
+function quantize(x, places, mode) {
+  const f = pow10(SCALE - BigInt(places));
+  return roundedDiv(x, f, mode) * f;
+}
+
+// String with exactly `places` decimals (quantize first for rounding; this truncates any residue).
+function toFixed(x, places) {
+  const neg = x < 0n;
+  const v = neg ? -x : x;
+  const scaled = v / pow10(SCALE - BigInt(places));
+  const s = scaled.toString().padStart(places + 1, "0");
+  const cut = s.length - places;
+  const intp = s.slice(0, cut) || "0";
+  const frac = places > 0 ? "." + s.slice(cut) : "";
+  return (neg && scaled !== 0n ? "-" : "") + intp + frac;
+}
+
+// gate.mjs — the JS-paise port of the deterministic gate (mirrors scripts/kit.py evaluate + its
+// modules exactly). Runs client-side in the chat-surface Artifact so the gate is available where no
+// shell is, with the model out of the loop. Byte-for-byte parity with the Python CLI is enforced by
+// tests/test_js_gate_parity.py — a single divergence blocks publish.
+
+const TWO = fromString("2");
+const roundPaisa = (x) => quantize(x, 2, "half_up");           // money.round_paisa (2dp HALF_UP)
+const rate = (rates, key) => fromString(rates[key].value);
+const sum = (...xs) => xs.reduce(add);
+const absDec = (x) => (x < 0n ? -x : x);
+const q = (x, places) => toFixed(quantize(x, places, "half_even"), places);  // matches kit.py _q
+const minDec = (...xs) => xs.reduce((a, b) => (cmp(a, b) <= 0 ? a : b));
+const floorToInt = (x) => Number(x / (10n ** 20n));           // 20-scale -> integer floor (positives)
+
+const DISCLAIMER = "Investment in securities market are subject to market risks. Read all the related documents carefully before investing. This is decision-support for research and educational use only, not investment advice; the author is not a SEBI-registered Investment Adviser or Research Analyst. You are solely responsible for your own decisions.";
+
+const FRESH = "fresh", DOWNGRADE = "stale_downgrade", NO_TRADE = "no_trade";
+const FRESH_CFG = { eod_max_age: 86400, ltp_live_max_age: 5, bar_max_age: 300, iv_max_age: 300 };
+const FREQ_OK = "ok";
+
+// ---- cost_tax.py ----
+function equityCosts(segment, side, price, qty, rates, brokerageFlat, dp) {
+  const turnover = mul(price, fromString(String(qty)));
+  const ZERO = fromString("0");
+  let stt;
+  if (segment === "delivery") stt = roundPaisa(mul(turnover, rate(rates, "stt.delivery")));
+  else stt = side === "sell" ? roundPaisa(mul(turnover, rate(rates, "stt.intraday_sell"))) : ZERO;
+  const brokerage = roundPaisa(brokerageFlat);
+  const exchange = roundPaisa(mul(turnover, rate(rates, "exchange.cash")));
+  const sebi = roundPaisa(mul(turnover, rate(rates, "sebi.turnover")));
+  const stampKey = segment === "delivery" ? "stamp.delivery" : "stamp.intraday";
+  const stamp = side === "buy" ? roundPaisa(mul(turnover, rate(rates, stampKey))) : ZERO;
+  const dpc = (segment === "delivery" && side === "sell") ? roundPaisa(dp) : ZERO;
+  const gst = roundPaisa(mul(sum(brokerage, exchange, sebi, dpc), rate(rates, "gst.rate")));
+  const total = sum(stt, brokerage, exchange, sebi, gst, stamp, dpc);
+  return { stt, brokerage, exchange, sebi, gst, stamp, dp: dpc, total };
+}
+
+// ---- breakeven.py ----
+function statutoryBreakevenPct(price, qty, segment, rates, brokerage, dp) {
+  const notional = mul(price, fromString(String(qty)));
+  const buy = equityCosts(segment, "buy", price, qty, rates, brokerage, dp);
+  const sell = equityCosts(segment, "sell", price, qty, rates, brokerage, dp);
+  return div(add(buy.total, sell.total), notional);
+}
+
+// ---- freshness_matrix.py ----
+function freshnessVerdict(feedType, mode, phase, age, present, cfg) {
+  if (!present) return NO_TRADE;
+  if (feedType === "iv") return age <= cfg.iv_max_age ? FRESH : NO_TRADE;
+  if (mode === "eod") return age <= cfg.eod_max_age ? FRESH : DOWNGRADE;
+  if (mode === "live") {
+    if (feedType === "ltp") {
+      if (phase === "open") return age <= cfg.ltp_live_max_age ? FRESH : DOWNGRADE;
+      return age <= cfg.eod_max_age ? FRESH : DOWNGRADE;
+    }
+    return age <= cfg.bar_max_age ? FRESH : DOWNGRADE;
+  }
+  return DOWNGRADE;
+}
+
+// ---- frequency_governor.py ----
+function frequencyVerdict(t, o, maxT, maxO) {
+  if (t >= maxT) return `frequency: ${t} trades today >= cap ${maxT} (stand down)`;
+  if (o >= maxO) return `frequency: ${o} open positions >= cap ${maxO} (stand down)`;
+  return FREQ_OK;
+}
+
+// ---- sizing.py (swing path used by evaluate) ----
+function sizePosition(equity, riskPct, entry, atr, k, cap, heat, gross, exposure, tier, maxStop) {
+  const rps = mul(k, atr);
+  if (maxStop !== null && cmp(div(rps, entry), maxStop) > 0) return 0;
+  const sharesRisk = div(mul(equity, riskPct), rps);
+  const sharesHeat = div(heat, rps);
+  const sharesNotional = div(mul(equity, cap), entry);
+  const sharesGross = div(gross, entry);
+  return floorToInt(mul(minDec(sharesRisk, sharesHeat, sharesNotional, sharesGross), exposure));
+}
+
+// ---- exit_contract.py ----
+const rMultiple = (entry, stop, target) => div(sub(target, entry), sub(entry, stop));
+function bestR(entry, stop, targets) {
+  if (!targets.length) return null;
+  return targets.map((t) => rMultiple(entry, stop, t)).reduce((a, b) => (cmp(a, b) >= 0 ? a : b));
+}
+const passes2rGate = (entry, stop, targets) => {
+  const b = bestR(entry, stop, targets);
+  return b !== null && cmp(b, TWO) >= 0;
+};
+const trailingRule = (tier) => tier === "positional"
+  ? "governance-event / thesis-break exit; no ATR trail (the event is the stop)"
+  : "trail under the 10/21-EMA or last higher-low swing; ratchet by stage (never breakeven-at-1R)";
+function buildExitContract(entry, stop, targets, tier) {
+  const rps = sub(entry, stop);
+  return {
+    stop_price: stop, risk_per_share: rps, stop_distance_pct: div(sub(entry, stop), entry),
+    target_min_2r: add(entry, mul(TWO, rps)),
+    targets: targets.map((t) => ({ price: t, r: rMultiple(entry, stop, t) })),
+    trailing_rule: trailingRule(tier),
+  };
+}
+function exitJson(ec) {
+  return {
+    stop_price: q(ec.stop_price, 2), risk_per_share: q(ec.risk_per_share, 2),
+    stop_distance_pct: q(ec.stop_distance_pct, 8), target_min_2r: q(ec.target_min_2r, 2),
+    targets: ec.targets.map((t) => ({ price: q(t.price, 2), r: q(t.r, 4) })),
+    trailing_rule: ec.trailing_rule,
+  };
+}
+
+// ---- signal_gate.py (equity long path reached by evaluate) ----
+function validEquitySignal(entry, stop, c) {
+  if (cmp(stop, entry) >= 0) return false;                 // stop must be below entry for a long
+  const targets = (c.targets ?? ["0"]).filter((t) => t);   // Python: [D(t) for t in targets if t]
+  return targets.length > 0;
+}
+
+// ---- kit.py cmd_evaluate ----
+function evaluate(c, rates) {
+  const f = c.freshness;
+  const fv = freshnessVerdict(f.feed_type, f.mode, f.market_phase, f.age_seconds, f.present, FRESH_CFG);
+  const base = { symbol: c.symbol ?? null, disclaimer: DISCLAIMER };
+  if (fv === NO_TRADE) return { ...base, decision: "no_trade", shares: 0, veto_reason: "freshness: required feed stale or missing" };
+  const freq = c.frequency;
+  if (freq) {
+    const fvd = frequencyVerdict(freq.trades_today, freq.open_positions, freq.max_trades_per_day, freq.max_open_positions);
+    if (fvd !== FREQ_OK) return { ...base, decision: "no_trade", shares: 0, veto_reason: fvd };
+  }
+  const entry = fromString(c.entry), stop = fromString(c.stop);
+  const qtyNotional = mul(fromString(c.equity), fromString(c.cap));
+  let refQty = Number(qtyNotional / entry) || 1;
+  const be = statutoryBreakevenPct(entry, refQty, c.segment, rates, fromString(c.brokerage), fromString(c.dp));
+  const stopDistPct = div(absDec(sub(entry, stop)), entry);
+  if (cmp(stopDistPct, be) <= 0)
+    return { ...base, decision: "no_trade", shares: 0, veto_reason: `cost: stop distance ${q(stopDistPct, 8)} <= statutory break-even ${q(be, 8)}` };
+  const shares = sizePosition(fromString(c.equity), fromString(c.risk), entry, fromString(c.atr), TWO,
+    fromString(c.cap), fromString(c.heat), fromString(c.gross), fromString(c.exposure), c.tier ?? "swing", fromString(c.max_stop ?? "0.08"));
+  if (shares === 0) return { ...base, decision: "no_trade", shares: 0, veto_reason: "sizing: max-stop-distance or cap yields 0 shares" };
+  if (!validEquitySignal(entry, stop, c)) return { ...base, decision: "no_trade", shares: 0, veto_reason: "signal-gate: invalid signal object" };
+  const targetsList = (c.targets ?? []).filter((t) => t !== null && t !== "" && t !== "0" && t !== 0).map(fromString);
+  if (!passes2rGate(entry, stop, targetsList))
+    return { ...base, decision: "no_trade", shares: 0, veto_reason: "asymmetry: best target < 2R (need reward:risk >= 2:1 at entry)" };
+  const ec = buildExitContract(entry, stop, targetsList, c.tier ?? "swing");
+  return { ...base, decision: "long", shares, entry: q(entry, 2), stop: q(stop, 2),
+    statutory_breakeven_pct: q(be, 8), freshness: fv, exit: exitJson(ec), veto_reason: "" };
+}
+
+const RATES = {
+  "stt.delivery":          {"value": "0.001",   "as_of": "2026-04-01", "source": "Securities Transaction Tax Act (delivery equity, buy & sell)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stt.intraday_sell":     {"value": "0.00025", "as_of": "2024-10-01", "source": "Securities Transaction Tax Act (intraday equity, sell side)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stt.futures_sell":      {"value": "0.0005",  "as_of": "2026-04-01", "source": "Securities Transaction Tax Act (equity futures, sell side)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stt.options_sell":      {"value": "0.0015",  "as_of": "2026-04-01", "source": "Securities Transaction Tax Act (equity options, sell side, on premium)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stt.options_exercise":  {"value": "0.0015",  "as_of": "2026-04-01", "source": "Securities Transaction Tax Act (option exercise, on intrinsic value)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "tax.stcg_equity":       {"value": "0.20",    "as_of": "2024-07-23", "source": "Income-tax Act s.111A", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "tax.ltcg_equity":       {"value": "0.125",   "as_of": "2024-07-23", "source": "Income-tax Act s.112A", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "tax.ltcg_exemption_inr":{"value": "125000",  "as_of": "2024-07-23", "source": "Income-tax Act s.112A", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "exchange.cash":         {"value": "0.0000307","as_of": "2024-01-01","source": "NSE transaction charges (cash/equity)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "exchange.futures":      {"value": "0.0000183","as_of": "2024-01-01","source": "NSE transaction charges (equity futures)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "exchange.options":      {"value": "0.0003553","as_of": "2024-01-01","source": "NSE transaction charges (equity options, on premium)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "sebi.turnover":         {"value": "0.000001", "as_of": "2024-01-01", "source": "SEBI turnover fee", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "gst.rate":              {"value": "0.18",     "as_of": "2024-01-01", "source": "GST (CGST+SGST) on brokerage & exchange/SEBI charges", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stamp.delivery":        {"value": "0.00015",  "as_of": "2024-01-01", "source": "Uniform stamp duty (delivery equity)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stamp.intraday":        {"value": "0.00003",  "as_of": "2024-01-01", "source": "Uniform stamp duty (intraday equity)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stamp.futures":         {"value": "0.00002",  "as_of": "2024-01-01", "source": "Uniform stamp duty (equity futures)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"},
+  "stamp.options":         {"value": "0.00003",  "as_of": "2024-01-01", "source": "Uniform stamp duty (equity options)", "review_by": "2027-04-01", "hard_expiry": "2028-04-01"}
+};
+
+const $ = (id) => document.getElementById(id);
+document.getElementById("disclaimer").textContent = DISCLAIMER;
+
+function candidate(){
+  const t = $("target").value.trim();
+  return {
+    symbol: $("symbol").value || "—",
+    segment: $("segment").value,
+    entry: $("entry").value.trim(), stop: $("stop").value.trim(),
+    targets: t ? [t] : [],
+    atr: $("atr").value.trim(), equity: $("equity").value.trim(), risk: $("risk").value.trim(),
+    cap: $("cap").value.trim(), heat: $("heat").value.trim(), gross: $("gross").value.trim(),
+    exposure: $("exposure").value.trim(), brokerage: $("brokerage").value.trim(), dp: $("dp").value.trim(),
+    tier: "swing",
+    freshness: { feed_type: "ltp", mode: "eod", market_phase: "closed", age_seconds: 40000, present: true }
+  };
+}
+
+function esc(s){ return String(s).replace(/[&<>]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c])); }
+
+function render(r){
+  const out = $("out");
+  if (r.decision === "long"){
+    const ex = r.exit;
+    out.innerHTML =
+      '<span class="pill long">TRADE — passes every gate</span>' +
+      '<div class="verdict">' + esc(r.symbol) + ' · size ' + r.shares + ' shares</div>' +
+      '<dl class="kv">' +
+      '<dt>Entry</dt><dd>' + esc(r.entry) + '</dd>' +
+      '<dt>Stop</dt><dd>' + esc(ex.stop_price) + ' (' + esc(ex.stop_distance_pct) + ' away)</dd>' +
+      '<dt>Min target (2R)</dt><dd>' + esc(ex.target_min_2r) + '</dd>' +
+      '<dt>Best target R</dt><dd>' + esc(ex.targets.length ? ex.targets[0].r : "—") + '</dd>' +
+      '<dt>Break-even to clear costs</dt><dd>' + esc(r.statutory_breakeven_pct) + '</dd>' +
+      '</dl>' +
+      '<div class="trail">Exit rule: ' + esc(ex.trailing_rule) + '</div>';
+  } else {
+    out.innerHTML =
+      '<span class="pill no_trade">NO-TRADE</span>' +
+      '<div class="veto">Dominant reason — ' + esc(r.veto_reason) + '</div>' +
+      '<div class="note">The refusal is the feature. No setup is worth the survival risk here.</div>';
+  }
+}
+
+$("f").addEventListener("submit", (e) => {
+  e.preventDefault();
+  try { render(evaluate(candidate(), RATES)); }
+  catch (err) { $("out").innerHTML = '<div class="veto">Could not run: ' + esc(err.message) + '. Check the inputs.</div>'; }
+});
+render(evaluate(candidate(), RATES));
+</script>
+</body>
+</html>
