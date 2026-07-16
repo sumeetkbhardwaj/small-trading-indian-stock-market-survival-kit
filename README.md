@@ -1,56 +1,58 @@
 # small-trading-indian-stock-market-survival-kit
 
-A survival-first, evidence-based decision-support kit for Indian equity markets, usable with any LLM agent.
+A survival-first, evidence-based decision-support kit for Indian equity markets, usable with any LLM agent and **any Indian broker — or none at all**.
 
-> **Disclaimer.** This project is for research and educational purposes only. It is decision-support and advisory-only — it is **not investment advice**, and the author is **not a SEBI-registered Investment Adviser (IA) or Research Analyst (RA)**. The software is provided with no warranty of any kind (see [LICENSE](LICENSE)); use it entirely at your own risk. **Live order execution is out of scope for this public repository** — everything here is read-only research and monitoring. You are solely responsible for your own trading decisions and for your own regulatory compliance.
+> **Disclaimer.** For research and educational purposes only. Decision-support, advisory-only — **not investment advice**, and the author is **not a SEBI-registered Investment Adviser (IA) or Research Analyst (RA)**. Provided with no warranty (see [LICENSE](LICENSE)); use entirely at your own risk. **Live order execution is out of scope for this repository** — everything here is read-only research and monitoring. You are solely responsible for your own decisions and regulatory compliance.
 
 ## Philosophy
 
-The kit's prime directive is **capital preservation first, profit second**. No-trade is the default outcome and is always an acceptable one — the burden of proof sits on the trade, not on the refusal.
+The prime directive is **capital preservation first, profit second**. No-trade is the default and always acceptable — the burden of proof sits on the trade, not the refusal. This is grounded in SEBI's own retail-loss data (across FY22–24, ~93% of individual F&O traders net-lose after costs). An unconditional retail trade is negative-EV, so the kit says no until a stack of gates — regime, exclusion, technical, sizing, cost/tax, **exit/2R asymmetry**, and behavioral (overtrading) — is cleared.
 
-This is grounded in SEBI's own retail-loss data: across FY22–24, roughly **93% of individual F&O traders net-lose**, and fewer than 1% clear more than ₹1L after costs. An unconditional retail trade is negative-EV, so the kit's default posture is to say no until a stack of gates — regime, exclusion, technical, sizing, cost/tax, behavioral — is cleared.
+Design axiom: **the LLM proposes, the deterministic gate disposes.** All consequential math (sizing, cost/tax, exit contract, 2R gate, freshness, frequency) lives in plain Python, not in model reasoning — and it **fails closed to NO-TRADE / STAND-DOWN** whenever the gate could not run or the data is stale. The model never asserts a number the code did not compute.
 
-The design axiom is: **the LLM proposes, the deterministic gate disposes.** All consequential math (sizing, cost/tax, heat, freshness, signal validity) lives in plain Python scripts, not in model reasoning. The LLM selects among script-validated options; it never asserts a number the code did not compute.
+## The capability lattice — works on every surface, fails closed at each rung
+
+The kit is **broker-agnostic** and **surface-agnostic**, degrading honestly (never to confident prose):
+
+- **Data — a broker-agnostic `MarketData` port.** Baseline needs **no broker**: free public web (**screener.in** fundamentals + **Yahoo `.NS`/`.BO`** delayed quotes) + **manual-paste** holdings, every reading stamped `{value, source, as_of, delay_class}`. A **read-only broker MCP** (Upstox/Kotak read-only by construction preferred; any broker equal opt-in) is optional enrichment for live private state — and **every broker order/GTT write tool is structurally denied** by a PreToolUse hook (the kit never places, modifies, or cancels an order).
+- **Gate — a self-identifying resolver.** A connected **Gate MCP** → the **`kit.py` CLI** (Claude Code / Cloud Routine / paid-tier chat) → a client-side **JS-paise gate Artifact** (plain chat, model out of the loop) → else **REFUSE** and default to NO-TRADE. Never free-LLM gate math.
 
 ## What it does
 
-small-trading-indian-stock-market-survival-kit is a **read-only advisory** pipeline: it screens the market, shortlists candidates, and turns each shortlisted idea into a signal — hold, trim, or exit for existing positions; go/no-go for fresh ones. It does not place, modify, or cancel orders. Every output ends with the SEBI-safe disclaimer, and the tool's default answer is no-trade.
+A **read-only advisory** pipeline that screens, shortlists, and turns each idea into a signal — with a machine-computed **exit contract** (stop · R-target · trailing rule) and a hard **2R asymmetry** requirement — and evaluates/monitors existing positions. Where the surface supports it, reports render as **beautiful, self-contained Artifacts** (theme-aware, provenance-labeled, disclaimer-footed). It never places an order; every output ends with the SEBI-safe disclaimer; the default answer is no-trade.
 
-## Features
+## Skills & commands
 
-- **Deterministic survival-math core** (`scripts/`) — cost/tax engine, position sizing, portfolio heat, data-freshness checks, and the signal-validity gate, covered by a unit-test suite (CI across Python 3.11–3.13).
-- **Read-only skills and commands** — `/small-trader:check`, `/small-trader:screen`, `/small-trader:portfolio-watch`, `/small-trader:premarket`, `/small-trader:eod`, and `/small-trader:autopilot` — that orchestrate the deterministic core against live or EOD market data.
-- **Kite MCP read-only data path** — quotes/holdings/positions/historical via the Zerodha Kite MCP connector, governed by an explicit data-freshness contract (market-phase x feed-type x mode); stale or missing data fails closed to no-action.
-- **Fully autonomous mode (Cloud Routines)** — the `autopilot` skill runs the whole review (regime → portfolio → opportunity scan → notify) unattended on Anthropic's cloud: zero human interaction, zero self-hosting. A routine is a real code-execution session, so the deterministic gate runs there — you get autonomy *and* verified, model-invariant results. Read-only; no execution tool reachable (see `routines/autopilot-routine.md`).
+- `/small-trader:check TICKER` — full survival-gate stack on one name (TRADE / NO-TRADE + dominant reason + counterfactual cost).
+- `/small-trader:screen` — screen a universe; return only the few that pass, with a beautiful shortlist Artifact.
+- `/small-trader:research` — deep, cited, survival-first brief on a stock or theme (risks first).
+- `/small-trader:portfolio-watch` — daily hold/trim/exit alerts on your holdings.
+- `/small-trader:portfolio-eval` — deeper portfolio health: weight, P&L, concentration, per-name quality.
+- `/small-trader:watchlist` — ageing setups (armed / triggered / extended / invalidated / aged-out).
+- `/small-trader:premarket`, `/small-trader:eod`, `/small-trader:autopilot` — scheduled, unattended, **broker-free** Cloud-Routine reviews that notify you.
 
 ## How it works
 
-The architecture separates a deterministic core from an orchestration layer, so behavior is reproducible across LLMs:
-
-- **Layer A — deterministic core** (`scripts/`): pure, unit-tested functions for cost/tax, sizing, heat, freshness, and the signal gate. This layer holds every number the kit ever surfaces.
-- **Layer B — skills** (`skills/`, `commands/`): LLM-orchestrated pipelines that call into Layer A and assemble the final read-only report (screen, portfolio-watch, check).
-- No execution surface exists in this repository — there is no order-placement, modification, or cancellation tool wired into any skill or routine.
+- **Layer A — deterministic core** (`scripts/`): pure, unit-tested functions for cost/tax, sizing, portfolio heat, freshness, the signal gate, the **exit contract + 2R gate**, the **frequency governor**, the **MarketData port**, manual-paste, and portfolio/watchlist helpers. Every number the kit surfaces comes from here. Golden-fixture parity harness locks the output byte-for-byte (and is the reference the JS-paise Artifact port must reproduce).
+- **Layer B — skills** (`skills/`, `commands/`): LLM-orchestrated, broker-agnostic, fail-closed pipelines that fetch data through the port, call Layer A via the resolver, and render the report (text or Artifact).
+- **Structural safety**: a PreToolUse deny hook (`hooks/`) blocks every broker write tool; unattended routines carry no broker connector at all.
 
 ## Install & usage
 
-Follow [SETUP.md](SETUP.md) for the full install path (plugin install, Kite MCP read-only connector, Python env, Cloud Routine scheduling). Requirements: **Python 3.11+**; the deterministic core has **no third-party dependencies**; `pytest` is used for the test suite.
-
-Examples, once installed:
+Follow [SETUP.md](SETUP.md). Requirements: **Python 3.11+**; the deterministic core has **no third-party dependencies**; `pytest` for the test suite.
 
 ```
 /small-trader:check RELIANCE
-/small-trader:portfolio-watch
+/small-trader:portfolio-eval
 ```
-
-`/small-trader:check` runs the full survival-gate stack on one symbol and returns a plain TRADE / NO-TRADE verdict with the single dominant reason. `/small-trader:portfolio-watch` reviews your live holdings and flags any that need a hold/trim/exit decision today. Both are read-only and end with the disclaimer.
 
 ## Why the thresholds are trustworthy
 
-Every threshold in this kit traces to a cited primary source rather than an assumption. Cost, tax, and margin constants come from official exchange, CBDT, and broker schedules; the default-no-trade posture is grounded in published SEBI research on individual F&O and intraday trader outcomes. Before any threshold became a rule, the design was hardened through a refute-first verification pass and an adversarial multi-reviewer design review.
+Every threshold traces to a cited primary source (official exchange, CBDT, and broker schedules; published SEBI research), never an assumption. The design was hardened through refute-first verification and an adversarial multi-reviewer review.
 
 ## Scope & compliance
 
-This kit is **advisory-only**. Order execution is out of scope for this repository — v1 ships read-only screening, monitoring, and notification; nothing here places a trade. If you choose to build or deploy an execution layer on top of this kit, that is your own responsibility, including any SEBI algo-provider empanelment and static-IP/approval-gating requirements that apply. This project is not a SEBI-registered Investment Adviser or Research Analyst, and nothing it outputs is personalised investment advice.
+**Advisory-only.** Order execution is out of scope for this repository. If you build an execution layer on top, that is your own responsibility, including any SEBI algo-provider empanelment and static-IP/approval-gating that applies. Not a SEBI IA/RA; nothing output is personalised investment advice.
 
 ## Contributing
 
